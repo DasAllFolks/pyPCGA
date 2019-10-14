@@ -27,7 +27,7 @@ class Model:
         from psutil import cpu_count  # physcial cpu counts
         self.ncores = cpu_count(logical=False)
 
-        if params is not None: 
+        if params is not None:
             if 'deletedir' in params:
                 self.deletedir = params['deletedir']
             if 'homedir' in params:
@@ -56,20 +56,20 @@ class Model:
         self.chlDataLoc = None if 'chlDataLoc' not in params else params['chlDataLoc']
 
     def create_dir(self,idx=None):
-        
+
         mydirbase = "./simul/simul"
         if idx is None:
             idx = self.idx
-        
+
         mydir = mydirbase + "{0:04d}".format(idx)
         mydir = os.path.abspath(os.path.join(self.homedir, mydir))
-        
+
         if not os.path.exists(mydir):
             os.makedirs(mydir)
-        
+
         for filename in os.listdir(self.inputdir):
             copy2(os.path.join(self.inputdir,filename),mydir)
-        
+
         return mydir
 
     def cleanup(outputdir=None):
@@ -154,8 +154,8 @@ if __name__ == '__main__':
     Lx = 550
     Ly = 415
     x0, y0 = (62.0, 568.0)
-    t1 = dt.datetime(2015, 10, 07, 20, 00)
-    t2 = dt.datetime(2015, 10, 07, 21, 00)
+    t1 = dt.datetime(2015, 10, 7, 20, 00)
+    t2 = dt.datetime(2015, 10, 7, 21, 00)
 
     params = {'nx':nx,'ny':ny,'Lx':Lx,'Ly':Ly,'x0':x0,'y0':y0,'t1':t1,'t2':t2,
               'offline_dataloc':"./input_files/8m-array_2015100718_2015100722.nc"}
@@ -164,16 +164,16 @@ if __name__ == '__main__':
     print('(1) single run')
 
     simul_obs = mymodel.run(bathy,par)
-    #savemat('simul.mat',{'simul_obs':simul_obs})    
+    #savemat('simul.mat',{'simul_obs':simul_obs})
     ncores = 2
     nrelzs = 2
-    
+
     print('(2) parallel run with ncores = %d' % ncores)
     par = True # parallelization false
     bathyrelz = np.zeros((np.size(bathy,0),nrelzs),'d')
     for i in range(nrelzs):
         bathyrelz[:,i:i+1] = bathy + 0.1*np.random.randn(np.size(bathy,0),1)
-    
+
     simul_obs_all = mymodel.run(bathyrelz,par,ncores = ncores)
 
     print(simul_obs_all)
